@@ -93,7 +93,7 @@ def read_from_serial():
                         if last_weight is None or last_weight != weight:
                             last_weight = weight
                             GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for 20 seconds
-                            time.sleep(5)
+                            time.sleep(1)
                             GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay
 
                         # Check if a new day has started to create a new CSV file
