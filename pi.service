@@ -1,0 +1,15 @@
+[Unit]
+Description=PI Coding
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python /home/myadmin/para/pi.py
+WorkingDirectory=/home/myadmin/para/
+StandardOutput=journal
+StandardError=journal
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+User=myadmin
+
+[Install]
+WantedBy=multi-user.target
