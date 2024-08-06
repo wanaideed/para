@@ -9,3 +9,35 @@ sudo systemctl daemon-reload
 
 sudo systemctl enable web.service
 sudo systemctl enable pi.service
+
+
+sudo apt install python3-flask
+sudo apt install python3-serial
+
+
+Get Report Excel
+http://10.42.0.1:5000/download   - QR Img Given
+
+Update Minimum value
+http://10.42.0.1:5000/update_min/<min_valu>   -  example : 1.000
+
+wifi Name:
+SSID : myIP
+password : 12345678
+
+Log In OS
+username : myadmin
+password : P@ssw0rd123
+
+Check USB Device
+ls /dev/ttyUSB*
+
+Connect to wifi
+1. sudo nmcli device wifi list
+2. sudo nmcli device wifi connect "SSID_NAME" password "PASSWORD" ifname wlan0
+3. sudo nmcli device status - verify status device
+
+Connect to Hotsop
+1. nmcli device
+2. sudo nmcli device wifi hotspot ssid <hotspot name> password <hotspot password> ifname wlan0
+3. nmcli connection
