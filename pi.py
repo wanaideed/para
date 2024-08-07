@@ -62,6 +62,15 @@ def read_from_serial():
     current_filename = create_new_file()
     min_threshold = read_min_threshold()
     try:
+        GPIO.output(relay_pins['first'], GPIO.LOW)
+        GPIO.output(relay_pins['second'], GPIO.LOW)
+        GPIO.output(relay_pins['third'], GPIO.LOW)
+        GPIO.output(relay_pins['fourth'], GPIO.LOW)
+        time.sleep(3)
+        GPIO.output(relay_pins['first'], GPIO.HIGH)
+        GPIO.output(relay_pins['second'], GPIO.HIGH)
+        GPIO.output(relay_pins['third'], GPIO.HIGH)
+        GPIO.output(relay_pins['fourth'], GPIO.HIGH)
         while True:
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8').strip()

@@ -15,6 +15,15 @@ def download_file():
         return "File not found", 404
 
 
+@app.route('/file/<name>', methods=['GET'])
+def download_file_by_name(name):
+    filename = name + ".csv"
+    if os.path.exists(filename):
+        return send_file(filename, as_attachment=True)
+    else:
+        return "File not found", 404
+
+
 @app.route('/update_min/<value>')
 def update_min(value):
     # Get the 'value' parameter from the query string
