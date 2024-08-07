@@ -18,6 +18,9 @@ sudo apt install python3-serial
 Get Report Excel
 http://10.42.0.1:5000/download   - QR Img Given
 
+Get Report Excel by day
+http://10.42.0.1:5000/file/04082024   - QR Img Given
+
 Update Minimum value
 http://10.42.0.1:5000/update_min/<min_valu>   -  example : 1.000
 
