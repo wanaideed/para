@@ -29,6 +29,10 @@ Log In OS
 username : myadmin
 password : P@ssw0rd123
 
+ssh by dns
+- ssh myadmin@raspberrypi.local
+- P@ssw0rd123
+
 Check USB Device
 ls /dev/ttyUSB*
 
