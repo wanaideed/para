@@ -3,6 +3,7 @@ import re
 import RPi.GPIO as GPIO
 import time
 import csv
+import os
 from datetime import datetime
 
 # Configure the serial port
@@ -33,9 +34,10 @@ for pin in relay_pins.values():
 # Function to create a new CSV file with the current date
 def create_new_file():
     filename = datetime.now().strftime("%d%m%Y") + ".csv"
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["value", "datetime"])  # Write the header
+    if not os.path.isfile(filename):
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["value", "datetime"])  # Write the header
     return filename
 
 
