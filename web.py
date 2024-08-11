@@ -5,9 +5,13 @@ import time
 import pandas as pd
 import io
 import shutil
-
+from flask_cors import CORS
 # Flask app setup
 app = Flask(__name__)
+
+
+# Enable CORS for all routes
+CORS(app)
 
 # Path to the file
 file_path = 'MainWeight.txt'
@@ -159,7 +163,7 @@ def search_data():
 
 @app.route('/export', methods=['POST'])
 def export_data():
-    USB_MOUNT_PATH = '/mnt/usb'
+    USB_MOUNT_PATH = '/dev/sda1'
     """Generate a CSV file with data for the specified date range and copy it to a USB drive."""
     from_str = request.form.get('from')
     to_str = request.form.get('to')
