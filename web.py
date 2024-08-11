@@ -1,4 +1,4 @@
-from flask import Flask, send_file, jsonify, request
+from flask import Flask, send_file, jsonify, request, Response
 import os
 from datetime import datetime, timedelta
 import time
@@ -25,29 +25,48 @@ def get_file_mod_time():
 # Function to read data from the file
 def read_file():
     with open(file_path, 'r') as file:
-        return file.read()
+        return file.read().strip()
 
 
-@app.route('/poll', methods=['GET'])
-def poll():
-    start_time = time.time()
-    timeout = 30  # Set timeout for the long polling
+# @app.route('/poll', methods=['GET'])
+# def poll():
+#     start_time = time.time()
+#     timeout = 30  # Set timeout for the long polling
+#
+#     # Get the initial modification time of the file
+#     last_mod_time = get_file_mod_time()
+#
+#     while time.time() - start_time < timeout:
+#         current_mod_time = get_file_mod_time()
+#
+#         if current_mod_time != last_mod_time:
+#             # File has changed, return the new data
+#             new_data = read_file()
+#             return jsonify({"data": new_data})
+#
+#         time.sleep(1)  # Sleep to avoid busy-waiting
+#
+#     # If no new data after timeout, return empty response or a default value
+#     return jsonify({"data": "No new data"}), 204
 
-    # Get the initial modification time of the file
+
+def generate_events():
     last_mod_time = get_file_mod_time()
-
-    while time.time() - start_time < timeout:
+    while True:
         current_mod_time = get_file_mod_time()
 
         if current_mod_time != last_mod_time:
-            # File has changed, return the new data
+            # File has changed, send new data
             new_data = read_file()
-            return jsonify({"data": new_data})
+            yield f"data: {new_data}\n\n"
+            last_mod_time = current_mod_time
 
-        time.sleep(1)  # Sleep to avoid busy-waiting
+        time.sleep(1)  # Check for changes every 1 second
 
-    # If no new data after timeout, return empty response or a default value
-    return jsonify({"data": "No new data"}), 204
+
+@app.route('/poll')
+def events():
+    return Response(generate_events(), content_type='text/event-stream')
 
 
 @app.route('/submit', methods=['POST'])

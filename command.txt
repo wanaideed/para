@@ -13,6 +13,8 @@ sudo systemctl enable pi.service
 
 sudo apt install python3-flask
 sudo apt install python3-serial
+sudo apt install python3-pandas
+sudo apt install python3-flask-cors
 
 
 Get Report Excel
@@ -58,3 +60,15 @@ OR
 
 1.sudo timedatectl set-ntp false
 2. sudo timedatectl set-time 'YYYY-MM-DD HH:MM:SS' // sudo timedatectl set-time '2024-08-05 15:30:00'
+
+
+get usb list
+1. df -h
+
+
+sudo apt install -y curl gnupg
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v
+npm -v
+

@@ -18,8 +18,8 @@ ser = serial.Serial(
 
 # GPIO pin configuration
 relay_pins = {
-    'first': 17,  # GPIO pin for the first condition / relay 1
-    'second': 18,  # GPIO pin for the second condition / relay 2
+    'first': 17,  # GPIO pin for the first condition / relay 1 hijau
+    'second': 18,  # GPIO pin for the second condition / relay 2 merah
     'third': 27,  # GPIO pin for the third condition / relay 3
     'fourth': 22  # GPIO pin for the fourth condition / relay 4
 }
@@ -49,13 +49,42 @@ def append_to_csv(filename, weight):
 
 
 # Function to read the minimum weight threshold from min.txt
-def read_min_threshold():
+def read_merah_threshold():
     try:
-        with open("min.txt", "r") as file:
+        with open("merah.txt", "r") as file:
             value = float(file.read().strip())
             return value
     except (FileNotFoundError, ValueError):
         return 1.000
+
+# Function to read the minimum weight threshold from min.txt
+def read_buzer_threshold():
+    try:
+        with open("buzzer.txt", "r") as file:
+            value = float(file.read().strip())
+            return value
+    except (FileNotFoundError, ValueError):
+        return 10
+
+
+# bunyi brpe second
+def read_kuning_threshold():
+    try:
+        with open("kuning.txt", "r") as file:
+            value = float(file.read().strip())
+            return value
+    except (FileNotFoundError, ValueError):
+        return 10
+
+
+# bunyi brpe second
+def read_hijau_threshold():
+    try:
+        with open("hijau.txt", "r") as file:
+            value = float(file.read().strip())
+            return value
+    except (FileNotFoundError, ValueError):
+        return 10
 
 
 # Function to write the weight to MainWeight.txt
@@ -67,7 +96,10 @@ def write_to_main_weight(weight):
 # Function to read from the serial port continuously
 def read_from_serial():
     current_filename = create_new_file()
-    min_threshold = read_min_threshold()
+    merah_threshold = read_merah_threshold()
+    buzzer_threshold = read_buzer_threshold()
+    kuning_threshold = read_kuning_threshold()
+    hijau_threshold = read_hijau_threshold()
     last_data_time = time.time()  # Track the last time data was received
     try:
         GPIO.output(relay_pins['first'], GPIO.LOW)
@@ -79,6 +111,11 @@ def read_from_serial():
         GPIO.output(relay_pins['second'], GPIO.HIGH)
         GPIO.output(relay_pins['third'], GPIO.HIGH)
         GPIO.output(relay_pins['fourth'], GPIO.HIGH)
+
+        if hijau_threshold == "ON":
+            GPIO.output(relay_pins['first'], GPIO.LOW)
+        else:
+            GPIO.output(relay_pins['first'], GPIO.HIGH)
         while True:
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8').strip()
@@ -93,19 +130,14 @@ def read_from_serial():
                         weight = float(match.group())
                         print(f"Weight: {data}")
                         write_to_main_weight(weight)
+                        append_to_csv(current_filename, weight)  # Write to CSV file
 
-                        if weight > min_threshold:
-                            print("Weight: Hijau")
-                            GPIO.output(relay_pins['first'], GPIO.LOW)  # Turn ON relay for first condition
-                            GPIO.output(relay_pins['second'], GPIO.HIGH)  # Turn OFF relay for second condition
-                            GPIO.output(relay_pins['third'], GPIO.HIGH)  # Turn OFF relay for third condition
-                            append_to_csv(current_filename, weight)  # Write to CSV file
-                        elif weight <= min_threshold and weight > 0.100:
+                        if weight <= merah_threshold and weight > 0.000:
                             print("Weight: Merah")
                             GPIO.output(relay_pins['first'], GPIO.HIGH)  # Turn OFF relay for first condition
                             GPIO.output(relay_pins['second'], GPIO.LOW)  # Turn ON relay for second condition
                             GPIO.output(relay_pins['third'], GPIO.HIGH)  # Turn OFF relay for third condition
-                        elif 0.000 <= weight <= 0.100:
+                        elif 0.000 <= weight <= buzzer_threshold:
                             print("Weight: Kuning")
                             GPIO.output(relay_pins['first'], GPIO.HIGH)  # Turn OFF relay for first condition
                             GPIO.output(relay_pins['second'], GPIO.HIGH)  # Turn OFF relay for second condition
@@ -113,19 +145,12 @@ def read_from_serial():
                         else:
                             print("Weight: Merah")  # Catch all other cases
 
-                        # Turn on the fourth relay for 20 seconds and turn off if the weight changes
-                        # if last_weight is None or last_weight != weight:
-                        #     last_weight = weight
-                        #     GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for 20 seconds
-                        #     time.sleep(0.5)
-                        #     GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay
-
                         # Check if a new day has started to create a new CSV file
                         new_filename = datetime.now().strftime("%d%m%Y") + ".csv"
                         if new_filename != current_filename:
                             current_filename = create_new_file()
 
-            if time.time() - last_data_time > 30:
+            if time.time() - last_data_time > kuning_threshold:
                 print("Idle")
                 GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
             # else:
