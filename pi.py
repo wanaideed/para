@@ -58,11 +58,17 @@ def read_min_threshold():
         return 1.000
 
 
+# Function to write the weight to MainWeight.txt
+def write_to_main_weight(weight):
+    with open("MainWeight.txt", "w") as file:
+        file.write(f"{weight:.3f}")  # Write the weight in decimal format (3 decimal places)
+
+
 # Function to read from the serial port continuously
 def read_from_serial():
-    last_weight = None
     current_filename = create_new_file()
     min_threshold = read_min_threshold()
+    last_data_time = time.time()  # Track the last time data was received
     try:
         GPIO.output(relay_pins['first'], GPIO.LOW)
         GPIO.output(relay_pins['second'], GPIO.LOW)
@@ -76,11 +82,18 @@ def read_from_serial():
         while True:
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8').strip()
+
+                last_data_time = time.time() # Reset the idle timer when data is received
+                # Turn off the buzzer if data is received
+                GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF buzzer
+
                 if data:
                     match = re.search(r'[-+]?\d*\.\d+', data)
                     if match:
                         weight = float(match.group())
                         print(f"Weight: {data}")
+                        write_to_main_weight(weight)
+
                         if weight > min_threshold:
                             print("Weight: Hijau")
                             GPIO.output(relay_pins['first'], GPIO.LOW)  # Turn ON relay for first condition
@@ -101,16 +114,23 @@ def read_from_serial():
                             print("Weight: Merah")  # Catch all other cases
 
                         # Turn on the fourth relay for 20 seconds and turn off if the weight changes
-                        if last_weight is None or last_weight != weight:
-                            last_weight = weight
-                            GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for 20 seconds
-                            time.sleep(0.5)
-                            GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay
+                        # if last_weight is None or last_weight != weight:
+                        #     last_weight = weight
+                        #     GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for 20 seconds
+                        #     time.sleep(0.5)
+                        #     GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay
 
                         # Check if a new day has started to create a new CSV file
                         new_filename = datetime.now().strftime("%d%m%Y") + ".csv"
                         if new_filename != current_filename:
                             current_filename = create_new_file()
+
+            if time.time() - last_data_time > 30:
+                print("Idle")
+                GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
+            # else:
+            #     GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay if not idle
+
 
     except KeyboardInterrupt:
         print("Stopped by user")
