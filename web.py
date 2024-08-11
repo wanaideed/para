@@ -163,7 +163,7 @@ def search_data():
 
 @app.route('/export', methods=['POST'])
 def export_data():
-    USB_MOUNT_PATH = '/dev/sda1'
+    USB_MOUNT_PATH = '/media/myadmin/6CA2-DBBC'
     """Generate a CSV file with data for the specified date range and copy it to a USB drive."""
     from_str = request.form.get('from')
     to_str = request.form.get('to')
@@ -196,6 +196,7 @@ def export_data():
         # Generate the filename for the CSV file
         file_name = f"{from_timestamp.strftime('%Y%m%d_%H%M%S')}_{to_timestamp.strftime('%Y%m%d_%H%M%S')}.csv"
         local_file_path = os.path.join('/tmp', file_name)  # Temporary path to store the file
+        os.makedirs('/tmp', exist_ok=True)
 
         # Save the CSV to a temporary file
         with open(local_file_path, 'w') as file:
