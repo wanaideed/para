@@ -167,7 +167,7 @@ const Login = () => {
         }
     }, [settingPanel]);
 
-    // long polling main data
+    // long polling main datca
     useEffect(() => {
         let eventSource;
 
