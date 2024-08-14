@@ -111,7 +111,7 @@ def read_from_serial():
         GPIO.output(relay_pins['second'], GPIO.HIGH)
         GPIO.output(relay_pins['third'], GPIO.HIGH)
         GPIO.output(relay_pins['fourth'], GPIO.HIGH)
-        print("LLLLLLLLLL",hijau_threshold)
+        print("LLLLLLLLLL",kuning_threshold)
         if hijau_threshold == "on":
             print("masukkkk")
             GPIO.output(relay_pins['first'], GPIO.LOW)
