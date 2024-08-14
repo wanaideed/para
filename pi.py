@@ -18,10 +18,10 @@ ser = serial.Serial(
 
 # GPIO pin configuration
 relay_pins = {
-    'first': 17,  # GPIO pin for the first condition / relay 1 hijau
-    'second': 18,  # GPIO pin for the second condition / relay 2 merah
-    'third': 27,  # GPIO pin for the third condition / relay 3
-    'fourth': 22  # GPIO pin for the fourth condition / relay 4
+    'hijau': 17,  # GPIO pin for the first condition / relay 1 hijau
+    'merah': 18,  # GPIO pin for the second condition / relay 2 merah
+    'kuning': 27,  # GPIO pin for the third condition / relay 3
+    'buzzer': 22  # GPIO pin for the fourth condition / relay 4
 }
 
 # Setup GPIO mode
@@ -71,7 +71,7 @@ def read_buzer_threshold():
 def read_kuning_threshold():
     try:
         with open("kuning.txt", "r") as file:
-            value = float(file.read().strip())
+            value = int(file.read().strip())
             return value
     except (FileNotFoundError, ValueError):
         return 10
@@ -104,31 +104,27 @@ def read_from_serial():
     print("hijau_threshold", hijau_threshold)
     print("kuning_threshold", kuning_threshold)
     print("buzzer_threshold", buzzer_threshold)
+    print("merah_threshold", merah_threshold)
     last_data_time = time.time()  # Track the last time data was received
     try:
-        GPIO.output(relay_pins['first'], GPIO.LOW)
-        GPIO.output(relay_pins['second'], GPIO.LOW)
-        GPIO.output(relay_pins['third'], GPIO.LOW)
-        GPIO.output(relay_pins['fourth'], GPIO.LOW)
+        GPIO.output(relay_pins['hijau'], GPIO.LOW)
+        GPIO.output(relay_pins['merah'], GPIO.LOW)
+        GPIO.output(relay_pins['kuning'], GPIO.LOW)
+        GPIO.output(relay_pins['buzzer'], GPIO.LOW)
         time.sleep(3)
-        GPIO.output(relay_pins['first'], GPIO.HIGH)
-        GPIO.output(relay_pins['second'], GPIO.HIGH)
-        GPIO.output(relay_pins['third'], GPIO.HIGH)
-        GPIO.output(relay_pins['fourth'], GPIO.HIGH)
+        GPIO.output(relay_pins['hijau'], GPIO.HIGH)
+        GPIO.output(relay_pins['merah'], GPIO.HIGH)
+        GPIO.output(relay_pins['kuning'], GPIO.HIGH)
+        GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
 
-        if hijau_threshold == "on":
-            print("HIJAU ON")
-            GPIO.output(relay_pins['first'], GPIO.LOW)
-        else:
-            print("HIJAU OFF")
-            GPIO.output(relay_pins['first'], GPIO.HIGH)
+
         while True:
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8').strip()
 
                 last_data_time = time.time() # Reset the idle timer when data is received
                 # Turn off the buzzer if data is received
-                GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF buzzer
+                GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF buzzer
 
                 if data:
                     match = re.search(r'[-+]?\d*\.\d+', data)
@@ -138,29 +134,45 @@ def read_from_serial():
                         write_to_main_weight(weight)
                         append_to_csv(current_filename, weight)  # Write to CSV file
 
-                        if weight <= merah_threshold and weight > 0.000:
+                        if weight > merah_threshold:
+                            if hijau_threshold == "on":
+                                print("HIJAU ON")
+                                GPIO.output(relay_pins['hijau'], GPIO.LOW)
+                                GPIO.output(relay_pins['merah'], GPIO.HIGH)
+                                GPIO.output(relay_pins['kuning'], GPIO.HIGH)
+                                GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
+                            else:
+                                print("HIJAU OFF")
+                                GPIO.output(relay_pins['hijau'], GPIO.HIGH)
+                                GPIO.output(relay_pins['merah'], GPIO.HIGH)
+                                GPIO.output(relay_pins['kuning'], GPIO.HIGH)
+                                GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
+                        elif weight <= merah_threshold and weight > 0.000:
                             print("Weight: Merah")
-                            GPIO.output(relay_pins['first'], GPIO.HIGH)  # Turn OFF relay for first condition
-                            GPIO.output(relay_pins['second'], GPIO.LOW)  # Turn ON relay for second condition
-                            GPIO.output(relay_pins['third'], GPIO.HIGH)  # Turn OFF relay for third condition
-                        elif 0.000 <= weight <= buzzer_threshold:
+                            GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
+                            GPIO.output(relay_pins['merah'], GPIO.LOW)  # Turn ON relay for second condition
+                            GPIO.output(relay_pins['kuning'], GPIO.HIGH)  # Turn OFF relay for third condition
+
+                            GPIO.output(relay_pins['buzzer'], GPIO.LOW)  # Turn OFF relay for third condition
+                        elif 0.000 == weight:
                             print("Weight: Kuning")
-                            GPIO.output(relay_pins['first'], GPIO.HIGH)  # Turn OFF relay for first condition
-                            GPIO.output(relay_pins['second'], GPIO.HIGH)  # Turn OFF relay for second condition
-                            GPIO.output(relay_pins['third'], GPIO.LOW)  # Turn ON relay for third condition
-                        else:
-                            print("Weight: Merah")  # Catch all other cases
+                            GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
+                            GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
+                            GPIO.output(relay_pins['kuning'], GPIO.LOW)  # Turn ON relay for third condition
+                            GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
 
                         # Check if a new day has started to create a new CSV file
                         new_filename = datetime.now().strftime("%d%m%Y") + ".csv"
                         if new_filename != current_filename:
                             current_filename = create_new_file()
 
-            if time.time() - last_data_time > kuning_threshold:
+            if time.time() - last_data_time > int(kuning_threshold):    ## value second
                 print("Idle")
-                GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
-            # else:
-            #     GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay if not idle
+                GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
+                GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
+                GPIO.output(relay_pins['kuning'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
+                GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
+
 
 
     except KeyboardInterrupt:
