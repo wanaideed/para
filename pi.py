@@ -162,6 +162,8 @@ def read_from_serial():
 
                         if weight <= buzzer_threshold and weight > 0.000:
                             GPIO.output(relay_pins['buzzer'], GPIO.LOW)
+                            time.sleep(1)
+                            GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
                         else:
                             GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
 
