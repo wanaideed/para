@@ -182,7 +182,7 @@ def search_data():
 
 @app.route('/export', methods=['POST'])
 def export_data():
-    USB_MOUNT_PATH = '/media/myadmin/MIMIE'
+    USB_MOUNT_PATH = '/media/myadmin/ENG'
     """Generate a CSV file with data for the specified date range and copy it to a USB drive."""
     from_str = request.form.get('from')
     to_str = request.form.get('to')
