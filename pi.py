@@ -123,8 +123,7 @@ def read_from_serial():
                 data = ser.readline().decode('utf-8').strip()
 
                 last_data_time = time.time() # Reset the idle timer when data is received
-                # Turn off the buzzer if data is received
-                GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF buzzer
+
 
                 if data:
                     match = re.search(r'[-+]?\d*\.\d+', data)
@@ -153,13 +152,18 @@ def read_from_serial():
                             GPIO.output(relay_pins['merah'], GPIO.LOW)  # Turn ON relay for second condition
                             GPIO.output(relay_pins['kuning'], GPIO.HIGH)  # Turn OFF relay for third condition
 
-                            GPIO.output(relay_pins['buzzer'], GPIO.LOW)  # Turn OFF relay for third condition
+                            GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
                         elif 0.000 == weight:
                             print("Weight: Kuning")
                             GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
                             GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
                             GPIO.output(relay_pins['kuning'], GPIO.LOW)  # Turn ON relay for third condition
                             GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
+
+                        if weight <= buzzer_threshold and weight > 0.000:
+                            GPIO.output(relay_pins['buzzer'], GPIO.LOW)
+                        else:
+                            GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
 
                         # Check if a new day has started to create a new CSV file
                         new_filename = datetime.now().strftime("%d%m%Y") + ".csv"
