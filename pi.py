@@ -81,7 +81,7 @@ def read_kuning_threshold():
 def read_hijau_threshold():
     try:
         with open("hijau.txt", "r") as file:
-            value = float(file.read().strip())
+            value = file.read()
             return value
     except (FileNotFoundError, ValueError):
         return 10
@@ -112,7 +112,7 @@ def read_from_serial():
         GPIO.output(relay_pins['third'], GPIO.HIGH)
         GPIO.output(relay_pins['fourth'], GPIO.HIGH)
 
-        if hijau_threshold == "ON":
+        if hijau_threshold == "on":
             GPIO.output(relay_pins['first'], GPIO.LOW)
         else:
             GPIO.output(relay_pins['first'], GPIO.HIGH)
