@@ -100,6 +100,10 @@ def read_from_serial():
     buzzer_threshold = read_buzer_threshold()
     kuning_threshold = read_kuning_threshold()
     hijau_threshold = read_hijau_threshold()
+
+    print("hijau_threshold", hijau_threshold)
+    print("kuning_threshold", kuning_threshold)
+    print("buzzer_threshold", buzzer_threshold)
     last_data_time = time.time()  # Track the last time data was received
     try:
         GPIO.output(relay_pins['first'], GPIO.LOW)
@@ -111,11 +115,12 @@ def read_from_serial():
         GPIO.output(relay_pins['second'], GPIO.HIGH)
         GPIO.output(relay_pins['third'], GPIO.HIGH)
         GPIO.output(relay_pins['fourth'], GPIO.HIGH)
-        print("LLLLLLLLLL",kuning_threshold)
+
         if hijau_threshold == "on":
-            print("masukkkk")
+            print("HIJAU ON")
             GPIO.output(relay_pins['first'], GPIO.LOW)
         else:
+            print("HIJAU OFF")
             GPIO.output(relay_pins['first'], GPIO.HIGH)
         while True:
             if ser.in_waiting > 0:
