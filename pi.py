@@ -152,7 +152,7 @@ def read_from_serial():
                             current_filename = create_new_file()
 
             if time.time() - last_data_time > kuning_threshold:
-                # print("Idle")
+                print("Idle")
                 GPIO.output(relay_pins['fourth'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
             # else:
             #     GPIO.output(relay_pins['fourth'], GPIO.HIGH)  # Turn OFF relay if not idle
