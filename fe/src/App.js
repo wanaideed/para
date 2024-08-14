@@ -22,7 +22,7 @@ const Login = () => {
     const [selectedUser, setSelectedUser] = useState(options[0]);
     const [password, setPassword] = useState('111111');
     const [login, setLogin] = useState(false);
-    const [main, setMain] = useState(false);
+    const [main, setMain] = useState(true);
     const [dataPanel, setDataPanel] = useState(false);
     const [settingPanel, setSettingPanel] = useState(false);
 
@@ -206,38 +206,7 @@ const Login = () => {
     return (
         <>
             {
-                !login && (
-                    <div className="mt-5">
-                        <h5 style={{ fontWeight: 'bold' }}>Login</h5>
-                        <br />
-                        <div className="d-flex align-items-center">
-                            <label className="pe-3">Username: </label>
-                            <Select
-                                styles={{ container: (base) => ({ ...base, width: '50%' }) }}
-                                value={selectedUser}
-                                onChange={setSelectedUser}
-                                options={options}
-                                menuPlacement="bottom"
-                            />
-                        </div>
-                        <div className="d-flex align-items-center mt-3">
-                            <label style={{ paddingRight: '20px' }}>Password: </label>
-                            <Input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-50 h-50 mb-0"
-                            />
-                        </div>
-                        <br />
-                        <div className="d-flex align-items-center mt-3">
-                            <Button color="primary" style={{ width: '100px' }} onClick={() => { handleNavigate('main'); setLogin(true) }}>Login</Button>
-                        </div>
-                    </div>
-                )
-            }
-            {
-                main && login && (
+                main ?  (
                     <>
                         <div className="mt-5">
                             <h5 style={{ fontWeight: 'bold' }}>Main</h5>
@@ -262,132 +231,161 @@ const Login = () => {
                         <div style={footerStyle}>
                             <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('settings')}>Setting</Button>
                             <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('data')}>Data</Button>
-                            <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>Logout</Button>
+                            <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>{(login) ? "Logout" : "Login"}</Button>
                         </div>
                     </>
                 )
-            }
-            {
-                settingPanel && login && (
-                    <>
+                    :
+                    !login ? (
                         <div className="mt-5">
-                            <div className="d-flex align-items-center gap-2">
-                                <h5 style={{ fontWeight: 'bold' }}>Setting</h5>
-                                <Button color="success" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleSubmitSetting}>Update</Button>
+                            <h5 style={{ fontWeight: 'bold' }}>Login</h5>
+                            <br />
+                            <div className="d-flex align-items-center">
+                                <label className="pe-3">Username: </label>
+                                <Select
+                                    styles={{ container: (base) => ({ ...base, width: '50%' }) }}
+                                    value={selectedUser}
+                                    onChange={setSelectedUser}
+                                    options={options}
+                                    menuPlacement="bottom"
+                                />
+                            </div>
+                            <div className="d-flex align-items-center mt-3">
+                                <label style={{ paddingRight: '20px' }}>Password: </label>
+                                <Input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-50 h-50 mb-0"
+                                />
                             </div>
                             <br />
-                            <Row>
-                                <Col sm="2">
-                                    <label>LED Merah : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <div className="d-flex align-items-center">
-                                        <Input type="number" step="0.001" value={merah} onChange={(e) => setMerah(e.target.value)} />
-                                        <span className="ms-2 pb-3">Kg</span>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col sm="2">
-                                    <label>LED Kuning : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <div className="d-flex align-items-center">
-                                        <Input type="number" value={kuning} onChange={(e) => setKuning(e.target.value)} />
-                                        <span className="ms-2 pb-3">saat</span>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col sm="2">
-                                    <label>LED Hijau : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <div className="d-flex align-items-center">
-                                        <Input type="radio" id="led-on" name="led" value="on" checked={hijau === 'on'} onChange={(e) => setHijau(e.target.value)} />
-                                        <label htmlFor="led-on" className="ms-2 pb-3">ON</label>
-                                        <Input type="radio" id="led-off" name="led" value="off" checked={hijau === 'off'} className="ms-2" onChange={(e) => setHijau(e.target.value)} />
-                                        <label htmlFor="led-off" className="ms-2 pb-3">OFF</label>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col sm="2">
-                                    <label>Buzzer : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <div className="d-flex align-items-center">
-                                        <Input type="number" step="0.001" value={buzzer} onChange={(e) => setBuzzer(e.target.value)} />
-                                        <span className="ms-2 pb-3">Kg</span>
-                                    </div>
-                                </Col>
-                            </Row>
+                            <div className="d-flex align-items-center mt-3">
+                                <Button color="primary" style={{ width: '100px' }} onClick={() => { handleNavigate('main'); setLogin(true) }}>Login</Button>
+                            </div>
                         </div>
-                        <div style={footerStyle}>
-                            <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('main')}>Main</Button>
-                            <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('data')}>Data</Button>
-                            <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>Logout</Button>
-                        </div>
-                    </>
-                )
-            }
-            {
-                dataPanel && login && (
-                    <>
-                        <div className="mt-5">
-                            <h5 style={{ fontWeight: 'bold' }}>Data</h5>
-                            <br />
-                            <Row>
-                                <Col sm="1">
-                                    <label>From : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <Input type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} />
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col sm="1">
-                                    <label>To : </label>
-                                </Col>
-                                <Col sm="5">
-                                    <Input type="datetime-local" value={to} onChange={(e) => setTo(e.target.value)} />
-                                </Col>
-                                <Col sm="3">
-                                    <div className="d-flex align-items-center gap-2">
-                                        <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleSearchData}>Search</Button>
-                                        <Button color="success" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleExportData}>Export</Button>
+                    )
+                        : settingPanel && login ? (
+                                <>
+                                    <div className="mt-5">
+                                        <div className="d-flex align-items-center gap-2">
+                                            <h5 style={{ fontWeight: 'bold' }}>Setting</h5>
+                                            <Button color="success" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleSubmitSetting}>Update</Button>
+                                        </div>
+                                        <br />
+                                        <Row>
+                                            <Col sm="2">
+                                                <label>LED Merah : </label>
+                                            </Col>
+                                            <Col sm="5">
+                                                <div className="d-flex align-items-center">
+                                                    <Input type="number" step="0.001" value={merah} onChange={(e) => setMerah(e.target.value)} />
+                                                    <span className="ms-2 pb-3">Kg</span>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col sm="2">
+                                                <label>LED Kuning : </label>
+                                            </Col>
+                                            <Col sm="5">
+                                                <div className="d-flex align-items-center">
+                                                    <Input type="number" value={kuning} onChange={(e) => setKuning(e.target.value)} />
+                                                    <span className="ms-2 pb-3">saat</span>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col sm="2">
+                                                <label>LED Hijau : </label>
+                                            </Col>
+                                            <Col sm="5">
+                                                <div className="d-flex align-items-center">
+                                                    <Input type="radio" id="led-on" name="led" value="on" checked={hijau === 'on'} onChange={(e) => setHijau(e.target.value)} />
+                                                    <label htmlFor="led-on" className="ms-2 pb-3">ON</label>
+                                                    <Input type="radio" id="led-off" name="led" value="off" checked={hijau === 'off'} className="ms-2" onChange={(e) => setHijau(e.target.value)} />
+                                                    <label htmlFor="led-off" className="ms-2 pb-3">OFF</label>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col sm="2">
+                                                <label>Buzzer : </label>
+                                            </Col>
+                                            <Col sm="5">
+                                                <div className="d-flex align-items-center">
+                                                    <Input type="number" step="0.001" value={buzzer} onChange={(e) => setBuzzer(e.target.value)} />
+                                                    <span className="ms-2 pb-3">Kg</span>
+                                                </div>
+                                            </Col>
+                                        </Row>
                                     </div>
-                                </Col>
-                            </Row>
-                            <div style={{ overflowY: 'auto', height: '300px' }}>
-                                <Table striped>
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Value</th>
-                                            <th>Datetime</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.map((todo, index) => (
-                                            <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>{todo.value}</td>
-                                                <td>{todo.datetime}</td>
+                                    <div style={footerStyle}>
+                                        <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('main')}>Main</Button>
+                                        <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('data')}>Data</Button>
+                                        <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>Logout</Button>
+                                    </div>
+                                </>
+                        )
+                        :  dataPanel && login && (
+                            <>
+                                <div className="mt-5">
+                                    <h5 style={{ fontWeight: 'bold' }}>Data</h5>
+                                    <br />
+                                    <Row>
+                                        <Col sm="1">
+                                            <label>From : </label>
+                                        </Col>
+                                        <Col sm="5">
+                                            <Input type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} />
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col sm="1">
+                                            <label>To : </label>
+                                        </Col>
+                                        <Col sm="5">
+                                            <Input type="datetime-local" value={to} onChange={(e) => setTo(e.target.value)} />
+                                        </Col>
+                                        <Col sm="3">
+                                            <div className="d-flex align-items-center gap-2">
+                                                <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleSearchData}>Search</Button>
+                                                <Button color="success" style={{ width: '100px', alignSelf: 'center' }} size="sm" onClick={handleExportData}>Export</Button>
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                    <div style={{ overflowY: 'auto', height: '300px' }}>
+                                        <Table striped>
+                                            <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Value</th>
+                                                <th>Datetime</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </div>
-                        </div>
-                        <div style={footerStyle}>
-                            <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('settings')}>Setting</Button>
-                            <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('main')}>Main</Button>
-                            <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>Logout</Button>
-                        </div>
-                    </>
-                )
+                                            </thead>
+                                            <tbody>
+                                            {data.map((todo, index) => (
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{todo.value}</td>
+                                                    <td>{todo.datetime}</td>
+                                                </tr>
+                                            ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </div>
+                                <div style={footerStyle}>
+                                    <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('settings')}>Setting</Button>
+                                    <Button color="primary" style={{ width: '100px', alignSelf: 'center' }} onClick={() => handleNavigate('main')}>Main</Button>
+                                    <Button color="danger" style={{ width: '100px', alignSelf: 'center' }} onClick={() => { setLogin(false); setMain(false) }}>Logout</Button>
+                                </div>
+                            </>
+                        )
+
             }
+
+
 
         </>
     )
