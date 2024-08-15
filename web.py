@@ -82,9 +82,16 @@ def submit_data():
     save_to_file('kuning.txt', kuning)
     save_to_file('hijau.txt', hijau)
     save_to_file('buzzer.txt', buzzer)
+    import subprocess
+    try:
+        # Run the systemctl restart command
+        subprocess.run(['sudo', 'systemctl', 'restart', 'pi.service'], check=True)
+        return jsonify({"status": "OK"})
+    except subprocess.CalledProcessError as e:
+        return f"Failed to restart service: {str(e)}", 500
 
     # Return a status of OK
-    return jsonify({"status": "OK"})
+
 
 
 @app.route('/view-data', methods=['GET'])
