@@ -175,7 +175,7 @@ def read_from_serial():
             if time.time() - last_data_time > int(kuning_threshold):    ## value second
                 print("Idle")
                 # GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
-                GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
+                # GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
                 GPIO.output(relay_pins['kuning'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
                 # GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
 
