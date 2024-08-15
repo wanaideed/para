@@ -100,6 +100,7 @@ def read_from_serial():
     buzzer_threshold = read_buzer_threshold()
     kuning_threshold = read_kuning_threshold()
     hijau_threshold = read_hijau_threshold()
+    modeRelay = ""
 
     print("hijau_threshold", hijau_threshold)
     print("kuning_threshold", kuning_threshold)
@@ -122,6 +123,7 @@ def read_from_serial():
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8').strip()
 
+
                 last_data_time = time.time() # Reset the idle timer when data is received
 
 
@@ -134,6 +136,7 @@ def read_from_serial():
                         append_to_csv(current_filename, weight)  # Write to CSV file
 
                         if weight > merah_threshold:
+                            modeRelay = "hijau"
                             if hijau_threshold == "on":
                                 print("HIJAU ON")
                                 GPIO.output(relay_pins['hijau'], GPIO.LOW)
@@ -147,6 +150,7 @@ def read_from_serial():
                                 GPIO.output(relay_pins['kuning'], GPIO.HIGH)
                                 GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
                         elif weight <= merah_threshold and weight > 0.000:
+                            modeRelay = "merah"
                             print("Weight: Merah")
                             GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
                             GPIO.output(relay_pins['merah'], GPIO.LOW)  # Turn ON relay for second condition
@@ -154,6 +158,7 @@ def read_from_serial():
 
                             GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
                         elif 0.000 == weight:
+                            modeRelay = "kuning"
                             print("Weight: Kuning")
                             GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
                             GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
@@ -161,6 +166,7 @@ def read_from_serial():
                             GPIO.output(relay_pins['buzzer'], GPIO.HIGH)  # Turn OFF relay for third condition
 
                         if weight <= buzzer_threshold and weight > 0.000:
+                            modeRelay = modeRelay+"buzzer"
                             GPIO.output(relay_pins['buzzer'], GPIO.LOW)
                             time.sleep(3)
                             GPIO.output(relay_pins['buzzer'], GPIO.HIGH)
@@ -173,7 +179,11 @@ def read_from_serial():
                             current_filename = create_new_file()
 
             if time.time() - last_data_time > int(kuning_threshold):    ## value second
-                print("Idle")
+                if modeRelay == "merahbuzzer":
+                    GPIO.output(relay_pins['merah'], GPIO.HIGH)
+                elif modeRelay == "merah":
+                    GPIO.output(relay_pins['merah'], GPIO.LOW)
+                # print("Idle")
                 # GPIO.output(relay_pins['hijau'], GPIO.HIGH)  # Turn OFF relay for first condition
                 # GPIO.output(relay_pins['merah'], GPIO.HIGH)  # Turn OFF relay for second condition
                 GPIO.output(relay_pins['kuning'], GPIO.LOW)  # Turn ON relay for the fourth condition (delay)
